@@ -196,9 +196,9 @@ var isFlush = function (hand) {
 };
 
 var isStraight = function (hand) {
-    var a = false;
+    if(isWheel(hand)){ return true; }
     for (i = 0; i < 4; i++){
-      if(hand[i].rank !== hand[i+1].rank + 1){
+      if(hand[i].rank !== hand[i+1].rank + 1 ){
         return false;
       }; //endif
     }; //endfor
