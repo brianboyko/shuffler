@@ -135,6 +135,7 @@ var sortHand = function (hand) {
 };
 
 var eval = function () {
+    //var hand = [{"suit":1,"rank":12},{"suit":0,"rank":12},{"suit":3,"rank":12},{"suit":2,"rank":12},{"suit":2,"rank":8}]  // test code
     var hand = grabPokerHand();
     console.log(JSON.stringify(hand));
     hand = sortHand(hand);
@@ -195,11 +196,13 @@ var isFlush = function (hand) {
 };
 
 var isStraight = function (hand) {
-    if ((hand[0].rank === hand[4].rank + 4) || isWheel(hand)) {
-        return true;
-    } else {
+    var a = false;
+    for (i = 0; i < 4; i++){
+      if(hand[i].rank !== hand[i+1].rank + 1){
         return false;
-    };
+      }; //endif
+    }; //endfor
+    return true;
 };
 
 var isStraightFlush = function (hand) {
