@@ -1,6 +1,6 @@
 var arrayDeck = []; // Initialize the Deck
 
-['spades', 'hearts', 'diamonds', 'clubs'].forEach(function (suit) { // The array that lists the suits is literal here
+[0, 1, 2, 3].forEach(function (suit) { // The array that lists the suits is literal here
     for (var i = 0; i < 13; i++) {
         var card = {
             suit: suit,
@@ -18,6 +18,20 @@ var listDeck = function () {
 
 var translateCard = function (card) {
     var suit = card.suit;
+    switch (suit) {
+      case 0:
+        suit = 'spades'
+        break;
+      case 1:
+        suit = 'hearts'
+        break;
+      case 2: 
+        suit = 'diamonds'
+        break;
+      case 3:
+        suit = 'clubs'
+        break;
+    };
     var rank = card.rank + 2;
     switch (rank) {
         case 11:
@@ -44,19 +58,6 @@ var pickCard = function () {
     document.getElementById("pickedCard").innerHTML = JSON.stringify(arrayDeck[whichCard]);
     document.getElementById("inEnglish").innerHTML = translateCard(arrayDeck[whichCard]);
 };
-
-/*
-
-var spades = ['2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', 'Ts', 'Js', 'Qs', 'Ks', 'As'];
-var hearts = ['2h', '3h', '4h', '5h', '6h', '7h', '8h', '9h', 'Th', 'Jh', 'Qh', 'Kh', 'Ah'];
-var diamonds = ['2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', 'Td', 'Jd', 'Qd', 'Kd', 'Ad'];
-var clubs = ['2c', '3c', '4c', '5c', '6c', '7c', '8c', '9c', 'Tc', 'Jc', 'Qc', 'Kc', 'Ac'];
-var deck = [spades, hearts, diamonds, clubs];
-
-var listDeck = function() {
-  document.getElementById("listedDeck").innerHTML = arrayDeck;
-}
-*/
 
 // Pick a number corresponding to a card from 0 to 51
 
@@ -130,11 +131,14 @@ var sortHand = function (hand) {
         return 0;
     });
     document.getElementById("sortedHand").innerHTML = '' + translateCard(hand[0]) + ', ' + translateCard(hand[1]) + ', ' + translateCard(hand[2]) + ', ' + translateCard(hand[3]) + ', ' + translateCard(hand[4]);
+    return hand;
 };
 
 var eval = function () {
     var hand = grabPokerHand();
+    console.log(JSON.stringify(hand));
     hand = sortHand(hand);
+        console.log(JSON.stringify(hand));
     var x = 'whatevs';
     if (isStraightFlush(hand)) {
         x = 'Straight Flush';
@@ -142,9 +146,9 @@ var eval = function () {
         x = 'Four of a Kind';
     } else if (isBoat(hand)) {
         x = 'Full House';
-    }
-    //  else if(isFlush(hand)){ x =  'Flush'; }
-    else if (isStraight(hand)) {
+    }    else if(isFlush(hand)){ 
+      x =  'Flush'; 
+    }    else if (isStraight(hand)) {
         x = 'Straight';
     } else if (isTrips(hand)) {
         x = 'Three of a Kind';
@@ -153,7 +157,8 @@ var eval = function () {
     } else if (isPair(hand)) {
         x = 'One Pair';
     } else {
-        x = '' + hand[0].rank + ' high';
+        x = '' + translateCard(hand[0]) + ' high';
+            console.log(JSON.stringify(hand));
     };
     document.getElementById("evald").innerHTML = 'Result: ' + x;
     return x;
@@ -162,7 +167,7 @@ var eval = function () {
 
 var isWheel = function (hand) {
     if ( // multiline if! 
-    hand[0].rank === 12 && hand[1].rank === 0 && hand[2].rank === 1 && hand[3].rank === 2 && hand[4].rank === 3) {
+    hand[0].rank === 12 && hand[1].rank === 3 && hand[2].rank === 2 && hand[3].rank === 1 && hand[4].rank === 0) {
         return true;
     } else {
         return false;
@@ -170,8 +175,19 @@ var isWheel = function (hand) {
 };
 
 var isFlush = function (hand) {
-    if ( // multiline if! 
-    hand[1].suit === hand[0].suit && hand[2].suit === hand[0].suit && hand[3].suit === hand[0].suit && hand[4].suit === hand[0].suit) {
+      var flushhand = []
+      for(i=0; i < hand.length; i++) {flushhand[i] = hand[i];}
+      flushhand.sort(function (a, b) {
+        if (a.suit < b.suit) {
+            return 1;
+        }
+        if (a.suit > b.suit) {
+            return -1;
+        }
+        // a must be equal to b
+        return 0;
+    });
+    if ( flushhand[0].suit === flushhand[4].suit ) {
         return true;
     } else {
         return false;
@@ -179,9 +195,7 @@ var isFlush = function (hand) {
 };
 
 var isStraight = function (hand) {
-    if (hand[0].rank === hand[4] - 4) {
-        return true;
-    } else if (isWheel(hand)) {
+    if ((hand[0].rank === hand[4].rank + 4) || isWheel(hand)) {
         return true;
     } else {
         return false;
@@ -219,7 +233,7 @@ var isBoat = function (hand) {
 var isTrips = function (hand) {
     var a = hand[0].rank === hand[2].rank && hand[3].rank !== hand[4].rank; // true if XXXYZ 
     var b = hand[2].rank === hand[4].rank && hand[1].rank !== hand[2].rank; // true if XYZZZ
-    var C = hand[1].rank === hand[3].rank && hand[0].rank !== hand[4].rank; // only true if XYYYZ
+    var c = hand[1].rank === hand[3].rank && hand[0].rank !== hand[4].rank; // only true if XYYYZ
 
     if ((a || b || c) && !isQuads(hand)) {
         return true;
@@ -229,11 +243,11 @@ var isTrips = function (hand) {
 };
 
 var isTwoPair = function (hand) {
-    var a = hand[0].rank === hand[1].rank && hand[2].rank !== hand[3].rank; // true if XXYYZ 
-    var b = hand[0].rank === hand[1].rank && hand[3].rank !== hand[4].rank; // true if XXYZZ
-    var C = hand[1].rank === hand[2].rank && hand[3].rank !== hand[4].rank; // true if XYYZZ
+    var a = hand[0].rank === hand[1].rank && hand[2].rank == hand[3].rank; // true if XXYYZ 
+    var b = hand[0].rank === hand[1].rank && hand[3].rank == hand[4].rank; // true if XXYZZ \
+    var c = hand[1].rank === hand[2].rank && hand[3].rank == hand[4].rank; // true if XYYZZ 
 
-    if ((a || b || c) && !isQuads(hand) && !isBoat(hand)) {
+    if ((a || b || c) && !isQuads(hand) && !isBoat(hand) && !isTrips(hand)) {
         return true;
     } else {
         return false;
