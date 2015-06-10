@@ -1,6 +1,6 @@
 var arrayDeck = []; // Initialize the Deck
 
-[0, 1, 2, 3].forEach(function (suit) { // The array that lists the suits is literal here
+[0, 1, 2, 3].forEach(function (suit) { 
     for (var i = 0; i < 13; i++) {
         var card = {
             suit: suit,
@@ -63,6 +63,14 @@ var pickCard = function () {
 
 // NOW THE SHUFFLING BEGINS! 
 
+
+/* 
+
+// I wrote my own shuffler but found a one-line shuffler online. It works well enough. Here's my shuffler below. 
+
+// Look, I know it's stupid, but at least the algorithm works. Even if the worst case scenario *is* O(n^infinity)...
+// NOW THE SHUFFLING BEGINS! 
+
 var shuffle = function () {
 
     var shuffledDeck = []; //This is global 
@@ -110,11 +118,76 @@ var shuffle = function () {
     return shuffledDeckObjects;
 } // end shuffle()
 
+*/
+
+Array.prototype.clone = function() {
+    var input = this; 
+    var output = [];
+    for (i=0; i < input.length; i++){
+        output[i] = input[i];
+    }
+    return output; 
+}
+
+var parseDeck = function(deck){
+    var parsed = "";
+    for(i=0; i < deck.length; i++){
+        parsed = parsed + translateCard(deck[i]) + ", "; 
+    }
+    return parsed;
+}
+
+var getShuffle = function(){
+    var shuffledDeckObjects = arrayDeck.clone(); 
+    shuffledDeckObjects.sort(function() {return 0.5 - Math.random() }); //which array values go before others? Flip a coin! Got this from the web. 
+
+
+//debug code 
+
+    var unShuffledDeck = "";
+    var spades = "spades: ";
+    var hearts = "<BR>hearts: ";
+    var diamonds = "<BR>diamonds: ";
+    var clubs = "<BR>clubs: ";
+    for (i = 0; i < shuffledDeckObjects.length; i++){
+        var suitCase = shuffledDeckObjects[i].suit;
+            switch (suitCase){
+                case 0: 
+                    spades = spades + shuffledDeckObjects[i].rank + "s, "
+                    break;
+                case 1: 
+                    hearts = hearts + shuffledDeckObjects[i].rank + "h, "
+                    break;
+                case 2: 
+                    diamonds = diamonds + shuffledDeckObjects[i].rank + "d, "
+                    break;
+                case 3: 
+                    clubs = clubs + shuffledDeckObjects[i].rank + "c, "
+                    break;
+                default:
+                    break;            
+            }
+
+     }
+    document.getElementById("unShuffledDeck").innerHTML = spades + hearts + diamonds + clubs;
+
+//end debug code
+
+
+
+    document.getElementById("shuffledDeckObjects").innerHTML = JSON.stringify(shuffledDeckObjects);
+
+    var shuffledDeckCards = parseDeck(shuffledDeckObjects); 
+
+    document.getElementById("shuffledDeckCards").innerHTML = shuffledDeckCards;
+    return shuffledDeckObjects;
+}
+
 var grabPokerHand = function () {
-    var deck = shuffle();
-    var pokerHand = [deck[0], deck[1], deck[2], deck[3], deck[4]];
+    var deck = getShuffle();
+    var pokerHand = deck.slice(0,5);
     document.getElementById("pokerHandObjects").innerHTML = JSON.stringify(pokerHand);
-    document.getElementById("pokerHandNames").innerHTML = '' + translateCard(deck[0]) + ', ' + translateCard(deck[1]) + ', ' + translateCard(deck[2]) + ', ' + translateCard(deck[3]) + ', ' + translateCard(deck[4]);
+    document.getElementById("pokerHandNames").innerHTML = '' + translateCard(pokerHand[0]) + ', ' + translateCard(pokerHand[1]) + ', ' + translateCard(pokerHand[2]) + ', ' + translateCard(pokerHand[3]) + ', ' + translateCard(pokerHand[4]);
     return pokerHand;
 };
 
@@ -265,4 +338,134 @@ var isPair = function (hand) {
     } else {
         return false;
     }
+}
+
+
+// We'll need more specific values if we're going to compare hands.  
+
+var specifyHand = function(hand){
+    var ranking {
+        handtype: 0,
+        rank1: 0,
+        rank2: 0,
+        rank3: 0,
+        rank4: 0,
+        rank5: 0
+    }
+
+    if(isStraightFlush(hand)){
+        ranking.handtype = 9;
+        ranking.rank1 = hand[0].rank;
+        return ranking;
+    }
+    if(isQuads(hand)){
+        ranking.handtype = 8;
+        ranking.rank1 = hand[2].rank;
+            if (hand[2].rank !== hand[0].rank){
+                ranking.rank2 = hand[0].rank;
+            }
+            else{
+                ranking.rank2 = hand[4].rank; 
+            }
+        return ranking;
+    }
+
+    if(isBoat(hand)){
+        ranking.handtype = 7;
+        ranking.rank1 = hand[2].rank;
+            if (hand[2].rank !== hand[0].rank){
+                ranking.rank2 = hand[0].rank;
+            }
+            else{
+                ranking.rank2 = hand[4].rank; 
+            }
+        return ranking;
+    }
+    if(isFlush(hand)){
+        ranking.handtype = 6;
+        ranking.rank1 = hand[0].rank;
+        ranking.rank2 = hand[1].rank;
+        ranking.rank3 = hand[2].rank;
+        ranking.rank4 = hand[3].rank;
+        ranking.rank5 = hand[4].rank;
+        return ranking;
+    }
+    if(isStraight(hand)){
+        ranking.handtype = 5;
+            if(isWheel(hand)){
+                ranking.rank1 = 5
+            }
+            else{
+                ranking.rank1 = hand[0].rank; 
+            }
+        return ranking;
+    }
+    if(isTrips(hand)){
+        ranking.handtype = 4;
+        ranking.rank1 = hand[2].rank;
+            if (hand[0].rank !== hand[1].rank && hand[1].rank !== hand[2].rank){
+                ranking.rank2 = hand[0].rank;
+                ranking.rank3 = hand[1].rank;
+            }
+            if (hand[0].rank === hand[1].rank && hand[1].rank === hand[2].rank){
+                ranking.rank2 = hand[3].rank;
+                ranking.rank3 = hand[4].rank;
+            }
+            if (hand[0].rank !== hand[1].rank && hand[1].rank === hand[2].rank){
+                ranking.rank2 = hand[0].rank;
+                ranking.rank3 = hand[4].rank;
+            }
+        }
+        return ranking;
+    }
+    if(isTwoPair(hand)){
+        ranking.handtype = 3;
+        ranking.rank1 = hand[1].rank;
+        ranking.rank2 = hand[3].rank;
+            if (hand[0].rank === hand[1].rank && hand[2].rank === hand[3].rank){
+                ranking.rank3 = hand[4].rank; 
+            }
+            if (hand[1].rank === hand[2].rank && hand[3].rank === hand[4].rank){
+                ranking.rank3 = hand[0].rank; 
+            }
+            if (hand[0].rank === hand[1].rank && hand[3].rank === hand[4].rank){
+                ranking.rank3 = hand[2].rank; 
+            }
+    }
+    if(isPair(hand)){
+        ranking.handtype = 2;
+        if (hand[0].rank === hand[1].rank){
+            ranking.rank1 = hand[0].rank;
+            ranking.rank2 = hand[2].rank;
+            ranking.rank3 = hand[3].rank;
+            ranking.rank4 = hand[4].rank;
+        }
+        if (hand[1].rank === hand[2].rank){
+            ranking.rank1 = hand[1].rank;
+            ranking.rank2 = hand[0].rank;
+            ranking.rank3 = hand[3].rank;
+            ranking.rank4 = hand[4].rank;
+        }
+        if (hand[2].rank === hand[3].rank){
+            ranking.rank1 = hand[2].rank;
+            ranking.rank2 = hand[0].rank;
+            ranking.rank3 = hand[1].rank;
+            ranking.rank4 = hand[4].rank;
+        }
+        if (hand[3].rank === hand[4].rank){
+            ranking.rank1 = hand[3].rank;
+            ranking.rank2 = hand[0].rank;
+            ranking.rank3 = hand[1].rank;
+            ranking.rank4 = hand[2].rank;
+        }
+        if (!isStraightFlush(hand) && !isQuads(hand) && !isBoat(hand) && !isFlush(hand) && !isStraight(hand) && !isTrips(hand) && !isTwoPair(hand) && !isPair(hand)){
+            ranking.handtype = 1;
+            ranking.rank1 = hand[0].rank;
+            ranking.rank2 = hand[1].rank;
+            ranking.rank3 = hand[2].rank;
+            ranking.rank4 = hand[3].rank;
+            ranking.rank5 = hand[4].rank;
+        }
+
+        return ranking;
 }
