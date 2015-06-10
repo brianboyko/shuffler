@@ -52,6 +52,27 @@ var translateCard = function (card) {
     return "" + rank + " of " + suit;
 };
 
+var translateRankOnly = function (rank) {
+    var rank = rank + 2;
+    switch (rank) {
+        case 11:
+            rank = 'Jack'
+            break;
+        case 12:
+            rank = 'Queen'
+            break;
+        case 13:
+            rank = 'King'
+            break;
+        case 14:
+            rank = 'Ace'
+            break;
+        default:
+            break;
+    };
+    return "" + rank;
+};
+
 
 var pickCard = function () {
     var whichCard = Math.floor(Math.random() * 52);
@@ -120,7 +141,7 @@ var shuffle = function () {
 
 */
 
-Array.prototype.clone = function() {
+Array.prototype.clone = function() {  //This is weird, but basically it prevents a[] = b[1, 2, 3], a[0] = x, output b: x, 2, 3. Javascript passes a lot by reference that I thought would pass by values. But whatevs, Javascript, we're still cool. 
     var input = this; 
     var output = [];
     for (i=0; i < input.length; i++){
@@ -139,7 +160,7 @@ var parseDeck = function(deck){
 
 var getShuffle = function(){
     var shuffledDeckObjects = arrayDeck.clone(); 
-    shuffledDeckObjects.sort(function() {return 0.5 - Math.random() }); //which array values go before others? Flip a coin! Got this from the web. 
+    shuffledDeckObjects.sort(function() {return 0.5 - Math.random() }); //which array values go before others? Flip a coin! Got this from the web - hope I'm not "cargoculting".
 
 
 //debug code 
@@ -208,11 +229,12 @@ var sortHand = function (hand) {
 };
 
 var eval = function () {
-    //var hand = [{"suit":1,"rank":12},{"suit":0,"rank":12},{"suit":3,"rank":12},{"suit":2,"rank":12},{"suit":2,"rank":8}]  // test code
+    //var hand = [{"suit":0,"rank":9},{"suit":1,"rank":9},{"suit":2,"rank":5},{"suit":0,"rank":4},{"suit":1,"rank":2}]  // test code
     var hand = grabPokerHand();
     console.log(JSON.stringify(hand));
     hand = sortHand(hand);
         console.log(JSON.stringify(hand));
+    var ranking = specifyHand(hand); 
     var x = 'whatevs';
     if (isStraightFlush(hand)) {
         x = 'Straight Flush';
@@ -235,7 +257,12 @@ var eval = function () {
             console.log(JSON.stringify(hand));
     };
     document.getElementById("evald").innerHTML = 'Result: ' + x;
-    return x;
+
+
+    document.getElementById("ranking").innerHTML = JSON.stringify(ranking);
+    var rankingName = parseRanking(ranking);
+    document.getElementById("rankingName").innerHTML = rankingName
+    return ranking;
 };
 
 
@@ -344,13 +371,13 @@ var isPair = function (hand) {
 // We'll need more specific values if we're going to compare hands.  
 
 var specifyHand = function(hand){
-    var ranking {
-        handtype: 0,
-        rank1: 0,
-        rank2: 0,
-        rank3: 0,
-        rank4: 0,
-        rank5: 0
+    var ranking = {
+        handtype: -1,
+        rank1: -1,
+        rank2: -1,
+        rank3: -1,
+        rank4: -1,
+        rank5: -1
     }
 
     if(isStraightFlush(hand)){
@@ -415,7 +442,6 @@ var specifyHand = function(hand){
                 ranking.rank2 = hand[0].rank;
                 ranking.rank3 = hand[4].rank;
             }
-        }
         return ranking;
     }
     if(isTwoPair(hand)){
@@ -431,6 +457,7 @@ var specifyHand = function(hand){
             if (hand[0].rank === hand[1].rank && hand[3].rank === hand[4].rank){
                 ranking.rank3 = hand[2].rank; 
             }
+         return ranking;
     }
     if(isPair(hand)){
         ranking.handtype = 2;
@@ -458,14 +485,61 @@ var specifyHand = function(hand){
             ranking.rank3 = hand[1].rank;
             ranking.rank4 = hand[2].rank;
         }
-        if (!isStraightFlush(hand) && !isQuads(hand) && !isBoat(hand) && !isFlush(hand) && !isStraight(hand) && !isTrips(hand) && !isTwoPair(hand) && !isPair(hand)){
+        return ranking;
+    }
+    if (!isStraightFlush(hand) && !isQuads(hand) && !isBoat(hand) && !isFlush(hand) && !isStraight(hand) && !isTrips(hand) && !isTwoPair(hand) && !isPair(hand)){
             ranking.handtype = 1;
             ranking.rank1 = hand[0].rank;
             ranking.rank2 = hand[1].rank;
             ranking.rank3 = hand[2].rank;
             ranking.rank4 = hand[3].rank;
             ranking.rank5 = hand[4].rank;
-        }
+            return ranking;
+            }
+};
 
-        return ranking;
-}
+var parseRanking = function(ranking){ //takes object, returns string
+   var lingo = ""
+   switch (ranking.handtype){
+      case 9: //sf
+        lingo = translateRankOnly(ranking.rank1) + "-high Straight Flush."
+        return lingo;
+        break;
+      case 8:  //4k
+        lingo = "Quad " + translateRankOnly(ranking.rank1) + "s with a " + translateRankOnly(ranking.rank2) + " kicker.";
+        return lingo;
+        break;
+      case 7: //boat
+        lingo = translateRankOnly(ranking.rank1) + "s full of " + translateRankOnly(ranking.rank2) + "s.";
+        return lingo;
+        break;
+      case 6: //flush
+        lingo = translateRankOnly(ranking.rank1) + "-high Flush with " + translateRankOnly(ranking.rank2) + ", " + translateRankOnly(ranking.rank3) + ", " + translateRankOnly(ranking.rank4) + ", " + translateRankOnly(ranking.rank5) + " kickers."; 
+        return lingo;
+        break;
+      case 5: //straight
+        lingo = translateRankOnly(ranking.rank1) + "-high Straight."; 
+        return lingo;
+        break;
+      case 4: //trips
+        lingo = "Trip " + translateRankOnly(ranking.rank1) + "s with " + translateRankOnly(ranking.rank2) + ", " + translateRankOnly(ranking.rank3) + " kickers."; 
+        return lingo;
+        break;     
+      case 3: //2p
+        lingo = translateRankOnly(ranking.rank1) + "s up with " + translateRankOnly(ranking.rank2) + "s and a " + translateRankOnly(ranking.rank3) + " kicker."; 
+        return lingo;
+        break;       
+      case 2: //1p
+        lingo = "Pair of " + translateRankOnly(ranking.rank1) + "s with " + translateRankOnly(ranking.rank2) + ", " + translateRankOnly(ranking.rank3) + ", " + translateRankOnly(ranking.rank4) + " kickers."; 
+        return lingo;
+        break;
+      case 1: //highcard
+        lingo = translateRankOnly(ranking.rank1) + " high with " + translateRankOnly(ranking.rank2) + ", " + translateRankOnly(ranking.rank3) + ", " + translateRankOnly(ranking.rank4) + ", " + translateRankOnly(ranking.rank5) + " kickers."; 
+        return lingo;
+        break;                  
+
+      default:
+       return "I dunno.";
+       break;
+          };
+};
