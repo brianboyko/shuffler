@@ -384,7 +384,12 @@ var specifyHand = function(hand){
 
     if(isStraightFlush(hand)){
         ranking.handtype = 9;
+        if(isWheel(hand)){
+            ranking.rank1 = 3;
+        }
+        else{
         ranking.rank1 = hand[0].rank;
+        }
         return ranking;
     }
     if(isQuads(hand)){
