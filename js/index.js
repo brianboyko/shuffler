@@ -229,7 +229,7 @@ var sortHand = function (hand) {
 };
 
 var eval = function () {
-    //var hand = [{"suit":0,"rank":9},{"suit":1,"rank":9},{"suit":2,"rank":5},{"suit":0,"rank":4},{"suit":1,"rank":2}]  // test code
+    //var hand = [{"suit":0,"rank":12},{"suit":0,"rank":3},{"suit":0,"rank":2},{"suit":0,"rank":1},{"suit":0,"rank":0}]  // test code
     var hand = grabPokerHand();
     console.log(JSON.stringify(hand));
     hand = sortHand(hand);
@@ -366,9 +366,6 @@ var isPair = function (hand) {
         return false;
     }
 }
-<<<<<<< HEAD
-=======
-
 
 // We'll need more specific values if we're going to compare hands.  
 
@@ -550,4 +547,4 @@ var parseRanking = function(ranking){ //takes object, returns string
        break;
           };
 };
->>>>>>> origin/master
+
