@@ -548,3 +548,64 @@ var parseRanking = function(ranking){ //takes object, returns string
           };
 };
 
+var input1 = function(input){
+    document.getElementById("manualRankingName1").innerHTML = parseManualInput(input);
+};
+
+var parseManualInput = function(input){ //takes string of form AsKsQsTs9s from inputX() call
+    var hand = []
+    for (var i = 0; i < input.length; i = i + 2) {
+        inputRank = input.charAt(i)
+        inputSuit = input.charAt(i+1)
+            switch(inputRank){
+                case 'A':
+                    inputRank = 12;
+                    break;
+                case 'K':
+                    inputRank = 11;
+                    break;
+                case 'Q':
+                    inputRank = 10;
+                    break;
+                case 'J':
+                    inputRank = 9;
+                    break;
+                case 'T':
+                    inputRank = 8;
+                    break;
+                default:
+                    if(inputRank === NaN || inputRank < 2){
+                        console.log("not a valid card rank");
+                        inputRank = -1;
+                        break;
+                    }
+                    inputRank = inputRank - 2; 
+                    break;
+            }; // end switch(inputRank)
+            switch(inputSuit){
+                case 's':
+                    inputSuit = 0;
+                    break;
+                case 'h':
+                    inputSuit = 1;
+                    break;
+                case 'd':
+                    inputSuit = 2;
+                    break;
+                case 'c':
+                    inputSuit = 3;
+                    break;
+                default:
+                    console.log("not a suit");
+                    inputSuit = -1;
+                    break;
+            }; // end switch(inputsuit)
+            hand[i / 2] = {
+                rank: inputRank,
+                suit: inputSuit
+            }; //stick the card in the hand
+    }// end for loop
+    var ranking = specifyHand(hand);
+    var parsedRanking = parseRanking(ranking);
+    return parsedRanking; // returns string
+}
