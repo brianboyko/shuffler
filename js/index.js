@@ -556,10 +556,6 @@ var betterHand = function(player1, player2){
     };
 };
 
-var debugPickNofSet = function(){
-     return pickNofSet(['a','b','c','d','e','f','g'], 5);
-};
-
 // now the difficult bit. Evaluating multiple cards. I spent the better part of a weekend trying to do this myself, but could never get it.  
 // YEEEHAW, I DID IT. I DID IT. STUPID MOTHER TRUCKING RECRUSIVE CODE MULTIPLE LOOPS BUT I DID THAT SUMBITCH!
 // good news, it works, bad news, it's O(n^2) -- it also creates duplicate sets. I need to write a function that removes duplicates... 
@@ -604,21 +600,24 @@ var pickNofSet = function(set, n){
     console.log('output before removing duplicates: ' + output);
     console.log('number of combos found before removing duplicates: ' + output.length);
     output = removeDuplicates(output);
-    console.log('output before after duplicates: ' + output);
-    console.log('number of combos: ' + output.length);
+    console.log('output after duplicates: ' + output);
+    console.log('number of combos: ' + output.length)
+    console.log(JSON.stringify(output));
     return output;
 }; //end pickNofSet();
 
 // debug pickNofSet(['a','b','c','d','e','f','g'], 5)
+// debug console.log(removeDuplicates(['a','b','c'],['a','b','c'],['d','e','f'],['g','h','i']));
+// Not sure if JSON.stringify is the best way to go here. But it works for the scope of this project. 
 
 var removeDuplicates = function(input){ // takes array
     var output = [];
     for (i=0; i < input.length; i++){
         var unique = true; // all elements are innocent until proven guilty
         for(j=i+1; j < input.length; j++){
-            if(input[j] === input[i]){
+            if(JSON.stringify(input[j]) === JSON.stringify(input[i])) {  //  if(input[j] === input[i]){ does not work for arrays, so I have to create a new function.
                 unique = false; // guilty!
-            };// endif
+            }// endif           
         };// end jfor
         if(unique){ // if not found guilty, 
             output.push(input[i]); // you may go free, little element
@@ -627,3 +626,5 @@ var removeDuplicates = function(input){ // takes array
     console.log(output);
     return output;
 };//end function
+
+// Now, let's evaluate some holdem hands!
