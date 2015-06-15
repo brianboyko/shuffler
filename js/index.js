@@ -556,7 +556,74 @@ var betterHand = function(player1, player2){
     };
 };
 
+var debugPickNofSet = function(){
+     return pickNofSet(['a','b','c','d','e','f','g'], 5);
+};
 
 // now the difficult bit. Evaluating multiple cards. I spent the better part of a weekend trying to do this myself, but could never get it.  
-// This code is similar to https://gist.github.com/axelpale/3118596 - which I did study, but I made sure to write the code out and comment it thoroughly so that I understood it fully and I'm not just cargoculting. 
+// YEEEHAW, I DID IT. I DID IT. STUPID MOTHER TRUCKING RECRUSIVE CODE MULTIPLE LOOPS BUT I DID THAT SUMBITCH!
+// good news, it works, bad news, it's O(n^2) -- it also creates duplicate sets. I need to write a function that removes duplicates... 
+// create an array of arrays of all the different hands that can be made given N cards. 
 
+var pickNofSet = function(set, n){  
+    var output = [];
+    var head = [];
+    var tail = [];
+    //first, assert that 1 < n < set.length. 
+    if(n < 1 || typeof n !== 'number'){ // if N is 0 or NaN
+        return [];
+    };
+    if(n === set.length){
+        return [set]; // note that if set = ['A','B','C'] this returns[['A','B','C']]
+    }
+    if(n === 1){
+        for(i=0; i < set.length; i++){ // if n's just one, we just copy the set. 
+            output[i] = set[i]; 
+        };
+    };
+
+    head = set.slice(0, n); // head is the first N things of the array. 
+    console.log('head ' + head);
+    output.push(head); // it is the first answer.
+    tail = set.slice(n, set.length); // grab all the other things.
+    console.log('tail ' + tail);
+        for(var i=0; i < tail.length; i++){
+            var pivot = tail[i]; // set the nth card in the tail as the pivot. 
+            console.log('pivot ' + pivot);
+            var outputLength = output.length; //Because we want this to grow in iterations, not consistantly. First pass will be 1, second 6, third 31 (i think)
+            for(var j=0; j < outputLength; j++){ //for every combination we've got so far
+                var base = output[j]; // grab a combo
+                for(var k=0; k < base.length; k++){ // for every element in the combo
+                    var newCombo = base.slice(); // make a copy of the VALUE of the combo that resets each loop. 
+                    newCombo[k] = pivot; // switch out the pivot for each combo, and record each new combo to the output. 
+                    output.push(newCombo);
+                    console.log('new combo ' + newCombo + ' from ' + base); //debug 
+                }; // end kloop
+            };// end jloop
+        };//end iloop
+    console.log('output before removing duplicates: ' + output);
+    console.log('number of combos found before removing duplicates: ' + output.length);
+    output = removeDuplicates(output);
+    console.log('output before after duplicates: ' + output);
+    console.log('number of combos: ' + output.length);
+    return output;
+}; //end pickNofSet();
+
+// debug pickNofSet(['a','b','c','d','e','f','g'], 5)
+
+var removeDuplicates = function(input){ // takes array
+    var output = [];
+    for (i=0; i < input.length; i++){
+        var unique = true; // all elements are innocent until proven guilty
+        for(j=i+1; j < input.length; j++){
+            if(input[j] === input[i]){
+                unique = false; // guilty!
+            };// endif
+        };// end jfor
+        if(unique){ // if not found guilty, 
+            output.push(input[i]); // you may go free, little element
+        };// end if
+    };// end ifor
+    console.log(output);
+    return output;
+};//end function
