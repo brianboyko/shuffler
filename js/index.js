@@ -550,13 +550,11 @@ var betterHand = function(player1, player2){
     };
         var isTied = true;
         return player2;
-
 };
 
 // now the difficult bit. Evaluating multiple cards. I spent the better part of a weekend trying to do this myself, but could never get it.  
 // YEEEHAW, I DID IT. I DID IT. STUPID MOTHER TRUCKING RECRUSIVE CODE MULTIPLE LOOPS BUT I DID THAT SUMBITCH!
-// good news, it works, bad news, it's O(n^2) -- it also creates duplicate sets. I need to write a function that removes duplicates... 
-// create an array of arrays of all the different hands that can be made given N cards. 
+// good news, it works, bad news, it's O(n^2) 
 
 var pickNofSet = function(set, n){  
     var output = [];
@@ -632,6 +630,7 @@ var getSevenRandomCards = function(){
 
 var makeBestHand = function(){
     var hand = getSevenRandomCards();
+        document.getElementById("sevenCardSpread").innerHTML = 'Seven Card Hand: ' + translateDeck(hand);
     var allCombos = pickNofSet(hand, 5);
     for(var j=0; j < allCombos.length; j++){
         console.log('possible hand: ' + parseRanking(getRanking(allCombos[j])));
@@ -644,5 +643,11 @@ var makeBestHand = function(){
     };
     console.log(JSON.stringify(bestHand));
     console.log(translateDeck(bestHand));
+    document.getElementById("bestFiveOfSpread").innerHTML = 'The best hand is: ' + translateDeck(bestHand);
+    document.getElementById("bestHandRanked").innerHTML = 'Which is: ' + parseRanking(getRanking(bestHand));
+    document.getElementById("bestHandRanked").style.color = "black";
+    if(getRanking(bestHand).handtype >= 4){
+      document.getElementById("bestHandRanked").style.color = "red";
+    };
     console.log('best hand: ' + parseRanking(getRanking(bestHand)));
 }
