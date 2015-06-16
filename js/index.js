@@ -70,7 +70,7 @@ var translateCard = function (card){ // takes card as object
 
 var translateDeck = function(deck){ // takes deck as array of objects
     var parsed = [];
-    for(i=0; i < deck.length; i++){
+    for(var i=0; i < deck.length; i++){
         parsed[i] = translateCard(deck[i])
     };
     var translated = parsed.join(', ');
@@ -87,7 +87,7 @@ var pickCard = function () {
 
 var translateDeck = function(deck){ //takes object
     var parsed = "";
-    for(i=0; i < deck.length; i++){
+    for(var i=0; i < deck.length; i++){
         parsed = parsed + translateCard(deck[i]) + ", "; 
     };
     return parsed; //returns string
@@ -103,12 +103,6 @@ Array.prototype.shuffle = function(){
 var getShuffle = function(){
     var shuffledDeckObjects = arrayDeck.slice(); 
     shuffledDeckObjects.shuffle();
-
-//debug code
-    var shuffledDeckCards = translateDeck(shuffledDeckObjects); 
-    document.getElementById("shuffledDeckCards").innerHTML = shuffledDeckCards;
-//end debug code
-
     return shuffledDeckObjects; // returns array of 52 objects (a shuffled deck)
 };
 
@@ -127,8 +121,14 @@ var sortHand = function (hand) { // takes array of 5 objects
         if (a.rank > b.rank) {
             return -1;
         };
-        // a must be equal to b
-        return 0;
+        // rank a must be equal to rank b, so sort by suit. 
+        if (a.suit < b.suit) {
+            return 1;
+        };
+        if (a.suit > b.suit) {
+            return -1;
+        };
+        return 0; // this should only happen comparing a duplicate card - Ace of Spades vs. Ace of Spades
     });
     return hand; // returns sorted array of five objects ---- should I build this as a constructor? 
 };
@@ -145,7 +145,7 @@ var isWheel = function (hand) { // is this is a five high straight with Ace for 
 
 var isFlush = function (hand) { // is this a flush? 
       var flushhand = []
-      for(i=0; i < hand.length; i++) {flushhand[i] = hand[i];}
+      for(var i=0; i < hand.length; i++) {flushhand[i] = hand[i];}
       flushhand.sort(function (a, b) {
         if (a.suit < b.suit) {
             return 1;
@@ -166,7 +166,7 @@ var isFlush = function (hand) { // is this a flush?
 var isStraight = function (hand) { // is this a straight? 
     a = isWheel(hand);
     b = true;
-    for (i = 0; i < 4; i++){
+    for (var i = 0; i < 4; i++){
       if(hand[i].rank !== hand[i+1].rank + 1 ){
         b = false;
       }; //endif
@@ -260,7 +260,7 @@ var getRanking = function(hand){ //takes object
         isPair(hand)
     ];
 
-    for (i=0; i < whatDoYouHave.length; i++) {
+    for (var i=0; i < whatDoYouHave.length; i++) {
         if(whatDoYouHave[i] === true){
             ranking.handtype = 9 - i;
             i = whatDoYouHave.length + 1; // kill the loop. 
@@ -538,28 +538,23 @@ var betterHand = function(player1, player2){
     handArray1=[hand1.handtype, hand1.rank1, hand1.rank2, hand1.rank3, hand1.rank4, hand1.rank5];
     handArray2=[hand2.handtype, hand2.rank1, hand2.rank2, hand2.rank3, hand2.rank4, hand2.rank5];
 
-    for(i=0; i < 6; i++){
-        if(handArray1[i] === handArray2[i]){
-            var isTied = true;
-            return player1;
-        };
+    for(var i=0; i < 6; i++){
         if(handArray1[i] > handArray2[i]){
             i = 7;
-            var isTied = false;
             return player1;
         };
         if(handArray1[i] < handArray2[i]){
             i = 7;
-            var isTied = false;
             return player2;
         };
     };
+        var isTied = true;
+        return player2;
 };
 
 // now the difficult bit. Evaluating multiple cards. I spent the better part of a weekend trying to do this myself, but could never get it.  
 // YEEEHAW, I DID IT. I DID IT. STUPID MOTHER TRUCKING RECRUSIVE CODE MULTIPLE LOOPS BUT I DID THAT SUMBITCH!
-// good news, it works, bad news, it's O(n^2) -- it also creates duplicate sets. I need to write a function that removes duplicates... 
-// create an array of arrays of all the different hands that can be made given N cards. 
+// good news, it works, bad news, it's O(n^2) 
 
 var pickNofSet = function(set, n){  
     var output = [];
@@ -573,19 +568,16 @@ var pickNofSet = function(set, n){
         return [set]; // note that if set = ['A','B','C'] this returns[['A','B','C']]
     }
     if(n === 1){
-        for(i=0; i < set.length; i++){ // if n's just one, we just copy the set. 
+        for(var i=0; i < set.length; i++){ // if n's just one, we just copy the set. 
             output[i] = set[i]; 
         };
     };
 
     head = set.slice(0, n); // head is the first N things of the array. 
-    console.log('head ' + head);
     output.push(head); // it is the first answer.
     tail = set.slice(n, set.length); // grab all the other things.
-    console.log('tail ' + tail);
         for(var i=0; i < tail.length; i++){
             var pivot = tail[i]; // set the nth card in the tail as the pivot. 
-            console.log('pivot ' + pivot);
             var outputLength = output.length; //Because we want this to grow in iterations, not consistantly. First pass will be 1, second 6, third 31 (i think)
             for(var j=0; j < outputLength; j++){ //for every combination we've got so far
                 var base = output[j]; // grab a combo
@@ -593,16 +585,10 @@ var pickNofSet = function(set, n){
                     var newCombo = base.slice(); // make a copy of the VALUE of the combo that resets each loop. 
                     newCombo[k] = pivot; // switch out the pivot for each combo, and record each new combo to the output. 
                     output.push(newCombo);
-                    console.log('new combo ' + newCombo + ' from ' + base); //debug 
                 }; // end kloop
             };// end jloop
         };//end iloop
-    console.log('output before removing duplicates: ' + output);
-    console.log('number of combos found before removing duplicates: ' + output.length);
     output = removeDuplicates(output);
-    console.log('output after duplicates: ' + output);
-    console.log('number of combos: ' + output.length)
-    console.log(JSON.stringify(output));
     return output;
 }; //end pickNofSet();
 
@@ -612,9 +598,15 @@ var pickNofSet = function(set, n){
 
 var removeDuplicates = function(input){ // takes array
     var output = [];
-    for (i=0; i < input.length; i++){
+    for (var i=0; i < input.length; i++){
+        if(typeof input[i] === "object" && input[i][0].hasOwnProperty('rank') && input[i][0].hasOwnProperty('suit')){
+        sortHand(input[i]);
+        } else if (typeof input[i] === "object"){ input[i].sort(); }; //endif
+    }; // endfor
+        
+    for (var i=0; i < input.length; i++){
         var unique = true; // all elements are innocent until proven guilty
-        for(j=i+1; j < input.length; j++){
+        for(var j=i+1; j < input.length; j++){
             if(JSON.stringify(input[j]) === JSON.stringify(input[i])) {  //  if(input[j] === input[i]){ does not work for arrays, so I have to create a new function.
                 unique = false; // guilty!
             }// endif           
@@ -623,8 +615,39 @@ var removeDuplicates = function(input){ // takes array
             output.push(input[i]); // you may go free, little element
         };// end if
     };// end ifor
-    console.log(output);
     return output;
 };//end function
 
 // Now, let's evaluate some holdem hands!
+
+var getSevenRandomCards = function(){
+    var temp = getShuffle();
+    var sevenRandomCards = temp.slice(0,7);
+    console.log(JSON.stringify(sevenRandomCards));
+    console.log(translateDeck(sevenRandomCards));
+    return sevenRandomCards;
+}
+
+var makeBestHand = function(){
+    var hand = getSevenRandomCards();
+        document.getElementById("sevenCardSpread").innerHTML = 'Seven Card Hand: ' + translateDeck(hand);
+    var allCombos = pickNofSet(hand, 5);
+    for(var j=0; j < allCombos.length; j++){
+        console.log('possible hand: ' + parseRanking(getRanking(allCombos[j])));
+    }
+    var bestHand = allCombos[0];
+    for(var i=1; i < allCombos.length || i > 100; i++){
+        var newBestHand = betterHand(bestHand, allCombos[i]);
+//        console.log(parseRanking(getRanking(newBestHand)));
+        bestHand = newBestHand;
+    };
+    console.log(JSON.stringify(bestHand));
+    console.log(translateDeck(bestHand));
+    document.getElementById("bestFiveOfSpread").innerHTML = 'The best hand is: ' + translateDeck(bestHand);
+    document.getElementById("bestHandRanked").innerHTML = 'Which is: ' + parseRanking(getRanking(bestHand));
+    document.getElementById("bestHandRanked").style.color = "black";
+    if(getRanking(bestHand).handtype >= 4){
+      document.getElementById("bestHandRanked").style.color = "red";
+    };
+    console.log('best hand: ' + parseRanking(getRanking(bestHand)));
+}
