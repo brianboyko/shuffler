@@ -40,32 +40,13 @@
                 <p id="input2Rank"></P>
                 <p id="winner"></p>
             </form>
-<HR>
-            <p>Grab two manual holdem cards, and 5 random holdem hands and make the best possible Holdem Hand. If the hand is trips or better, the text will turn red.</p>
+            <p>Grab Seven Random Cards and make the best possible Holdem Hand. If the hand is trips or better, the text will turn red.<p>
             <form>
-                <p>Player 1:<input type="text" id="holeCardInput1" value="AdKh" name="holeCardInput1"/><BR/></p>
-                <p>Player 2:<input type="text" id="holeCardInput2" value="5d5c" name="holeCardInput2"/><BR/></p>
-                <p id="boardCards"></p>
-                <input type="button" id="compare" value= "Compare Hands" onClick="inputHoldem(document.getElementById('holeCardInput1').value, document.getElementById('holeCardInput2').value)">
-                <P id="input1Holdem"></P>
-                <p id="input2Holdem"></P>
-                <p id="winnerHoldem"></p>
+                <p id="sevenCardSpread">Seven Card Hand</p>
+                <P id="bestFiveOfSpread">Best Hand</P>
+                <P id="bestHandRanked">Best Hand Worded</P>
+                <input type="button" id="compare" value= "Get best five out of seven" onClick="makeBestHand()">
             </form>
-
-            <HR>
-
-            <!-- next step
-            <p>Grab two manual holdem cards, and up to five defined or random hole cards and define the equities using 100,000 monte carlo simulations. </p>
-            <form>
-                <p>Player 1:<input type="text" id="mcHand1" value="AdKh" name="mcHand1"/><BR/></p>
-                <p>Player 2:<input type="text" id="mcHand2" value="5d5c" name="mcHand2"/><BR/></p>
-                <p>Enter up to 5 board cards or leave blank (will fill with random hand).</p>
-                <p>Board<input type="text" id="mcBoard"" value="5d5c" name="holeCard2"/><BR/></p>
-                <input type="button" id="compare" value= "Monte Carlo Evaluation" onClick="inputHoldem(document.getElementById('holeCardInput1').value, document.getElementById('holeCardInput2').value)">
-                <P id="mcHand1Equity"></P>
-                <p id="mcHand2Equity"></P>
-             </form>
-            -->
 
 
 
@@ -73,7 +54,7 @@
     <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
     <script src='http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
 
-    <script src="js/index.js"></script>
+    <script src="js/alpha003.js"></script>
     
     
   </body>
