@@ -747,3 +747,103 @@ var removeDeadCards = function(deck, dead) {
         console.log(JSON.stringify(restDeck));
         return restDeck;
     } // end function
+
+var monteCarloEquity = function (hole1, hole2, board) {
+    var handsDealt = 0;
+    var hand1Wins = 0;
+    var hand2Wins = 0;
+    var ties = 0;
+    var hand1 = grabManualInputHand(hole1);
+    hand1.player = 'Player 1';
+    var hand2 = grabManualInputHand(hole2);
+    hand2.player = 'Player 2';
+    var boardCards = [];
+    var boardCards = grabManualInputHand(board);
+    var deadCards = hand1.concat(hand2, boardCards);
+    var restDeck = removeDeadCards(arrayDeck, deadCards);
+    console.log('boardcards ' + translateDeck(boardCards));
+    var handPlusBoard1 = hand1.concat(boardCards);
+    console.log('handboard1' + handPlusBoard1);
+    var handPlusBoard2 = hand2.concat(boardCards);
+    console.log('handboard2' + handPlusBoard2);
+    var cardsToGrab = 5 - boardCards.length;
+    console.log('cards to grab: ' + cardsToGrab);
+    console.log('roll them bones! 200k');
+    console.log(" hand 1 " + translateDeck(hand1) + " hand 2 " +translateDeck(hand2) + " board " +translateDeck(boardCards) +" dead " + translateDeck(deadCards) + " rest " + translateDeck(restDeck)) + " h1andboard " + translateDeck(handPlusBoard1);
+    for(var i = 0; i < 200000; i++){
+        console.log(i);
+        var newDeck = getShuffle(restDeck);
+        console.log(newDeck);
+        quantumCards = newDeck.slice(0,cardsToGrab);
+        console.log('quantumcards ' + translateDeck(quantumCards));
+        var test1 = handPlusBoard1.concat(quantumCards);
+        var test2 = handPlusBoard2.concat(quantumCards);
+        console.log('test 1 ' + translateDeck(test1));
+        var best1 = makeBestHand(test1);
+        var best2 = makeBestHand(test2);
+        console.log('best1 ' + translateDeck(best1));
+        var winner = betterHand(best1, best2);
+            if(winner.isTied){
+                ties++;
+            } else if (winner.player === 'Player 1'){
+                hand1Wins++;
+            } else {
+                hand2Wins++;
+            };
+            if (i % 1000 === 0){
+                console.log('Hands Dealt: ' + handsDealt + ' Hand 1 Wins: ' + hand1Wins + ' Hand 2 Wins: ' + hand2Wins);
+                console.log('Hand 1 equity: ' + (hand1Wins/i) + ' Hand 2 equity: ' + (hand1Wins/i) + ' Ties: ' + (ties/i));
+            };
+        }   // end iFor
+        var tieEquity = ties/handsDealt;
+        var hand1Equity = (hand1Wins / handsDealt);
+        var hand2Equity = (hand2Wins / handsDealt);
+        console.log('in 200k hands, Hand 1 equity: ' + hand1Equity + ' Hand 2 equity: ' + hand2Equity + ' Ties: ' + tieEquity);
+        document.getElementById(equity1).innerHTML = '  ' + ((hand1Equity * 100) + (tieEquity * 50)) + '%  ';
+        document.getElementById(equity1).style.background = equityColor(hand1Equity + (tieEquity/2));
+        document.getElementById(equity2).innerHTML = '  ' + ((hand2Equity * 100) + (tieEquity * 50)) + '%  ';
+        document.getElementById(equity2).style.background = equityColor(hand2Equity + (tieEquity/2));
+    };//endfunction
+
+var equityColor = function(equity){
+    if(equity >= .5){
+        var green = 'FF';
+        var red = (Math.floor(equity * 255)).toString(16);
+        var color = '#' + red + '' + green + '' + red + ''; 
+
+    } else{
+        var red = 'FF';
+        var green = (Math.floor(equity*255)).toString(16);
+        var color = '#' + red + '' + green + '' + green + ''; 
+    }
+    console.log(color);
+    return color;
+};
+
+
+
+
+var mcCardCount = function(hand1, hand2){
+    var numCards1 = 0;
+    var numCards2 = 0;
+    for (var i = 0; i < hand1.length; i++){
+        if(isCard(hand1[i])){
+            numCards1++;
+        };
+        if(isCard(hand2[i])){
+            numCards2++;
+        };
+    };
+    if(numCards1 === numCards2){
+        return numCards1;
+    } else { return -1; };
+};
+
+var isCard = function(card){
+    if(card.hasOwnProperty('rank') && card.hasOwnProperty('suit')){
+        return true;
+    }
+    else {
+        return false;
+    };
+};

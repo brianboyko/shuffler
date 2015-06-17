@@ -54,18 +54,16 @@
 
             <HR>
 
-            <!-- next step
-            <p>Grab two manual holdem cards, and up to five defined or random hole cards and define the equities using 100,000 monte carlo simulations. </p>
+        <p>Grab two manual holdem cards, and up to five defined or random hole cards and define the equities using 100,000 monte carlo simulations. </p>
             <form>
-                <p>Player 1:<input type="text" id="mcHand1" value="AdKh" name="mcHand1"/><BR/></p>
-                <p>Player 2:<input type="text" id="mcHand2" value="5d5c" name="mcHand2"/><BR/></p>
+                <p>Player 1:<input type="text" id="mcHand1" value="AdKh" name="mcHand1"/>Equity: <span id="equity1"></span><BR/></p>
+                <p>Player 2:<input type="text" id="mcHand2" value="5d5c" name="mcHand2"/>Equity: <span id="equity2"></span><BR/></p>
                 <p>Enter up to 5 board cards or leave blank (will fill with random hand).</p>
-                <p>Board<input type="text" id="mcBoard"" value="5d5c" name="holeCard2"/><BR/></p>
-                <input type="button" id="compare" value= "Monte Carlo Evaluation" onClick="inputHoldem(document.getElementById('holeCardInput1').value, document.getElementById('holeCardInput2').value)">
-                <P id="mcHand1Equity"></P>
-                <p id="mcHand2Equity"></P>
+                <p>Board<input type="text" id="mcBoard" value="" name="mcBoard"/><BR/></p>
+                <input type="button" id="compare" value= "Monte Carlo Evaluation" onClick="monteCarloEquity(document.getElementById('mcHand1').value, document.getElementById('mcHand2').value, document.getElementById('mcBoard').value)">
+
              </form>
-            -->
+
 
 
 
